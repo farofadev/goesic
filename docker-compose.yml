@@ -1,0 +1,19 @@
+version: "3"
+
+volumes:
+  mysql-data:
+
+services:
+  database:
+    image: mysql:8
+    command: mysqld --default-authentication-plugin=mysql_native_password
+    environment: 
+      MYSQL_DATABASE: goesic
+      MYSQL_USER: goesic
+      MYSQL_PASSWORD: goesic
+      MYSQL_ROOT_PASSWORD: goesic
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - ${GOESIC_MYSQL_FORWARD_PORT:-0}:3306
+  
