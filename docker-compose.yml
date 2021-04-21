@@ -14,6 +14,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-goesic}
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./goesic.sql:/docker-entrypoint-initdb.d/goesic.sql
     ports:
       - ${FORWARD_MYSQL_PORT:-0}:3306
   

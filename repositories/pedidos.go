@@ -4,21 +4,14 @@ import (
 	"log"
 
 	"github.com/farofadev/goesic/lib"
+	"github.com/farofadev/goesic/models"
+	"github.com/google/uuid"
 )
-
-type Pedido struct {
-	Id string `json:"id"`
-	PessoaId string `json:"pessoa_id"`
-	Situacao string `json:"situacao"`
-	CriadoEm string `json:"criado_em"`
-	DataPrazo string `json:"data_prazo"`
-}
 
 type PedidoRepository struct {}
 
-
-func (repository *PedidoRepository) FetchAll() *[]Pedido {
-	pedidos := []Pedido{}
+func (_ *PedidoRepository) FetchAll() *[]models.Pedido {
+	pedidos := []models.Pedido{}
 
 	database := lib.DBConnect()
 
@@ -30,7 +23,7 @@ func (repository *PedidoRepository) FetchAll() *[]Pedido {
 
 	for rows.Next() {
 		// Scan one customer record
-		pedido := Pedido{}
+		pedido := models.Pedido{}
 		err := rows.Scan(&pedido.Id, &pedido.PessoaId, &pedido.Situacao, &pedido.CriadoEm)
 
 		if err != nil {
@@ -46,8 +39,8 @@ func (repository *PedidoRepository) FetchAll() *[]Pedido {
 	return &pedidos
 }
 
-func (repository *PedidoRepository) FindById(id string) *Pedido {
-	pedido := Pedido{}
+func (_ *PedidoRepository) FindById(id string) *models.Pedido {
+	pedido := models.Pedido{}
 
 	database := lib.DBConnect()
 
@@ -69,4 +62,24 @@ func (repository *PedidoRepository) FindById(id string) *Pedido {
 	defer database.Close()
 
 	return &pedido
+}
+
+func (_ *PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {
+	
+	database := lib.DBConnect()
+
+	if pedido.Id == "" {
+		pedido.Id = uuid.NewString()
+	}
+
+	if pedido.Situacao == "" {
+		pedido.Situacao = "aberto"
+	}
+
+	rows, err := database.Query("INSERT INTO pedidos (id, pessoa_id, situacao, criado_em) VALUES (?,?,?,?);", pedido.Id, pedido.PessoaId, pedido.Situacao, pedido.CriadoEm)
+
+	defer rows.Close()
+	defer database.Close()
+
+	return pedido, err
 }

@@ -26,8 +26,8 @@ func main() {
 
     router.GET("/", Index)
     router.GET("/pedidos", pedidosController.Index)
-	router.POST("/pedidos", pedidosController.Criar)
-	router.GET("/pedidos/:id", pedidosController.Exibir)
+	router.POST("/pedidos", pedidosController.Store)
+	router.GET("/pedidos/:id", pedidosController.Show)
 
 	appHost := os.Getenv("APP_HOST")
 
