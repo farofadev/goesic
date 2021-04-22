@@ -13,7 +13,7 @@ type PedidosController struct {
     
 }
 
-func (_ *PedidosController) Index(res http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
+func (*PedidosController) Index(res http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
     repository := &repositories.PedidoRepository{}
    
     pedidos := repository.FetchAll()
@@ -33,7 +33,7 @@ func (_ *PedidosController) Index(res http.ResponseWriter, _ *http.Request, _ ht
     res.Write(re)
 }
 
-func (_ *PedidosController) Store(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func (*PedidosController) Store(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
     repository := &repositories.PedidoRepository{}
            
     decoder := json.NewDecoder(req.Body)
@@ -62,7 +62,7 @@ func (_ *PedidosController) Store(res http.ResponseWriter, req *http.Request, _ 
     res.Write(re)
 }
 
-func  (_ *PedidosController) Show(res http.ResponseWriter, _ *http.Request, params httprouter.Params) {
+func  (*PedidosController) Show(res http.ResponseWriter, _ *http.Request, params httprouter.Params) {
     id := params.ByName("id")
 
     repository := &repositories.PedidoRepository{}

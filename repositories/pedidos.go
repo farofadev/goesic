@@ -10,7 +10,7 @@ import (
 
 type PedidoRepository struct {}
 
-func (_ *PedidoRepository) FetchAll() *[]models.Pedido {
+func (*PedidoRepository) FetchAll() *[]models.Pedido {
 	pedidos := []models.Pedido{}
 
 	database := lib.DBConnect()
@@ -39,7 +39,7 @@ func (_ *PedidoRepository) FetchAll() *[]models.Pedido {
 	return &pedidos
 }
 
-func (_ *PedidoRepository) FindById(id string) *models.Pedido {
+func (*PedidoRepository) FindById(id string) *models.Pedido {
 	pedido := models.Pedido{}
 
 	database := lib.DBConnect()
@@ -64,7 +64,7 @@ func (_ *PedidoRepository) FindById(id string) *models.Pedido {
 	return &pedido
 }
 
-func (_ *PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {
+func (*PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {
 	
 	database := lib.DBConnect()
 
@@ -76,7 +76,11 @@ func (_ *PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) 
 		pedido.Situacao = "aberto"
 	}
 
-	rows, err := database.Query("INSERT INTO pedidos (id, pessoa_id, situacao, criado_em) VALUES (?,?,?,?);", pedido.Id, pedido.PessoaId, pedido.Situacao, pedido.CriadoEm)
+	rows, err := database.Query("INSERT INTO pedidos (id, pessoa_id, situacao, criado_em, data_prazo) VALUES (?,?,?,?,?);", pedido.Id, pedido.PessoaId, pedido.Situacao, pedido.CriadoEm, pedido.DataPrazo)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	defer rows.Close()
 	defer database.Close()

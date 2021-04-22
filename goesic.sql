@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS `pedidos` (
   `pessoa_id` char(36) NOT NULL,
   `situacao` varchar(36) DEFAULT NULL,
   `criado_em` datetime DEFAULT NULL,
+  `data_prazo` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `pedidos_pessoa_id_index` (`pessoa_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
