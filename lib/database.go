@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"os"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -43,4 +44,22 @@ func DBConnectAndSetDefault() *sql.DB {
 
 func GetDefaultDBConnection() *sql.DB {
 	return defaultDBConnection
+}
+
+func LoopVerifyDefaultDBConnection() {
+	for {
+		db := GetDefaultDBConnection();
+
+		log.Println("Verificando banco de dados")
+
+		_, err := db.Query("SHOW TABLES;")
+
+		if err != nil {
+			log.Println("Conexão falhou, tentando reconectar...")
+
+			DBConnectAndSetDefault();
+		}
+
+		time.Sleep(30 * time.Second)
+	}
 }
