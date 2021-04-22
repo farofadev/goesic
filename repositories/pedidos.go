@@ -1,8 +1,6 @@
 package repositories
 
 import (
-	"log"
-
 	"github.com/farofadev/goesic/lib"
 	"github.com/farofadev/goesic/models"
 	"github.com/google/uuid"
@@ -10,7 +8,7 @@ import (
 
 type PedidoRepository struct {}
 
-func (*PedidoRepository) FetchAll() *[]models.Pedido {
+func (*PedidoRepository) FetchAll() (*[]models.Pedido, error) {
 	pedidos := []models.Pedido{}
 
 	database := lib.GetDefaultDBConnection()
@@ -18,7 +16,7 @@ func (*PedidoRepository) FetchAll() *[]models.Pedido {
 	rows, err := database.Query("SELECT id, pessoa_id, situacao, criado_em, data_prazo FROM pedidos;")
 
 	if err != nil  {
-		log.Fatal(err)
+		return &pedidos,err
 	}
 
 	defer rows.Close()
@@ -29,16 +27,16 @@ func (*PedidoRepository) FetchAll() *[]models.Pedido {
 		err := rows.Scan(&pedido.Id, &pedido.PessoaId, &pedido.Situacao, &pedido.CriadoEm, &pedido.DataPrazo)
 
 		if err != nil {
-			log.Println(err)
+			return &pedidos, err
 		}
 
 		pedidos = append(pedidos, pedido)
 	}
 
-	return &pedidos
+	return &pedidos, nil
 }
 
-func (*PedidoRepository) FindById(id string) *models.Pedido {
+func (*PedidoRepository) FindById(id string) (*models.Pedido, error) {
 	pedido := models.Pedido{}
 
 	database := lib.GetDefaultDBConnection()
@@ -46,7 +44,7 @@ func (*PedidoRepository) FindById(id string) *models.Pedido {
 	rows, err := database.Query("SELECT id, pessoa_id, situacao, criado_em, data_prazo FROM pedidos where id = ? LIMIT 1;", id)
 
 	if err != nil  {
-		log.Fatal(err)
+		return &pedido, err
 	}
 
 	defer rows.Close()
@@ -55,11 +53,11 @@ func (*PedidoRepository) FindById(id string) *models.Pedido {
 		err := rows.Scan(&pedido.Id, &pedido.PessoaId, &pedido.Situacao, &pedido.CriadoEm, &pedido.DataPrazo)
 
 		if err != nil {
-			log.Println(err)
+			return &pedido, err
 		}
 	}
 
-	return &pedido
+	return &pedido, nil
 }
 
 func (*PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {
@@ -77,10 +75,10 @@ func (*PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {
 	rows, err := database.Query("INSERT INTO pedidos (id, pessoa_id, situacao, criado_em, data_prazo) VALUES (?,?,?,?,?);", pedido.Id, pedido.PessoaId, pedido.Situacao, pedido.CriadoEm, pedido.DataPrazo)
 
 	if err != nil {
-		log.Fatal(err)
+		return pedido, err
 	}
 
 	defer rows.Close()
 
-	return pedido, err
+	return pedido, nil
 }

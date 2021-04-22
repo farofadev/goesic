@@ -16,7 +16,14 @@ type PedidosController struct {
 func (*PedidosController) Index(res http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
     repository := &repositories.PedidoRepository{}
    
-    pedidos := repository.FetchAll()
+    pedidos, err := repository.FetchAll()
+
+    if err != nil {
+        res.Header().Set("Content-Type", "application/json")
+        res.WriteHeader(http.StatusInternalServerError)
+        res.Write([]byte(`{"message": "Erro não esperado.", "error": true}`))
+        return
+    }
 
     var payload struct {
         Data *[]models.Pedido `json:"data"`
@@ -40,14 +47,17 @@ func (*PedidosController) Store(res http.ResponseWriter, req *http.Request, _ ht
 
 	var pedido models.Pedido
 
-	err := decoder.Decode(&pedido)
-    
-	if err != nil {
-		panic(err)
-	}
+	decoder.Decode(&pedido)
 
-    repository.Store(&pedido)
+    _, err := repository.Store(&pedido)
     
+    if err != nil {
+        res.Header().Set("Content-Type", "application/json")
+        res.WriteHeader(http.StatusInternalServerError)
+        res.Write([]byte(`{"message": "Erro não esperado.", "error": true}`))
+        return
+    }
+
     var payload struct {
         Data *models.Pedido `json:"data"`
         Error bool `json:"error"`
@@ -67,7 +77,14 @@ func  (*PedidosController) Show(res http.ResponseWriter, _ *http.Request, params
 
     repository := &repositories.PedidoRepository{}
 
-    pedido := repository.FindById(id)
+    pedido, err := repository.FindById(id)
+
+    if err != nil {
+        res.Header().Set("Content-Type", "application/json")
+        res.WriteHeader(http.StatusInternalServerError)
+        res.Write([]byte(`{"message": "Erro não esperado.", "error": true}`))
+        return
+    }
 
     if pedido.Id == "" {
         res.Header().Set("Content-Type", "application/json")

@@ -11,7 +11,7 @@ import (
 
 var defaultDBConnection *sql.DB
 
-func DBConnect() *sql.DB {
+func DBConnect() (*sql.DB, error) {
 	config := mysql.NewConfig()
 	config.Net = "tcp"
 	config.Addr = os.Getenv("DB_HOST")
@@ -22,14 +22,15 @@ func DBConnect() *sql.DB {
 	db, err := sql.Open("mysql", config.FormatDSN())
 
 	if (err != nil) {
-		log.Fatal("Error when trying to connect to database", err)
+		log.Println("Error when trying to connect to database", err)
+		return db, err
 	}
 
 	db.SetMaxIdleConns(64)
 	db.SetMaxOpenConns(64)
 	db.SetConnMaxLifetime(-1)
 
-	return db
+	return db, err
 }
 
 func SetDefaultDBConnection(db *sql.DB) *sql.DB {
@@ -38,29 +39,40 @@ func SetDefaultDBConnection(db *sql.DB) *sql.DB {
 	return db
 }
 
-func DBConnectAndSetDefault() *sql.DB {
-	return SetDefaultDBConnection(DBConnect())
+func DBConnectAndSetDefault() (*sql.DB, error) {
+	db, err := DBConnect()
+
+	return SetDefaultDBConnection(db), err
 }
 
 func GetDefaultDBConnection() *sql.DB {
 	return defaultDBConnection
 }
 
-func LoopVerifyDefaultDBConnection() {
+func LoopVerifyDefaultDBConnection() error {
+	previous := false
+
 	for {
-		db := GetDefaultDBConnection();
-
-		log.Println("Verificando banco de dados")
-
+		db := GetDefaultDBConnection()
 		_, err := db.Query("SHOW TABLES;")
 
 		if err != nil {
-			log.Println("A conexão falhou: ", err)
-			log.Println("Tentando reconectar...")
+			log.Println("A conexão com o Banco de Dados falhou: ", err)
 
-			DBConnectAndSetDefault();
+			connection, cerr := DBConnectAndSetDefault()
+
+			if cerr != nil|| connection == nil {
+				previous = true
+				log.Println("Falhou ao reconectar...", cerr)
+			}
+		} 
+
+		if (previous) {
+			time.Sleep(5 * time.Second)
+		} else {
+			time.Sleep(30 * time.Second)
 		}
 
-		time.Sleep(30 * time.Second)
+		
 	}
 }
