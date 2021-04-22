@@ -18,13 +18,17 @@ func DBConnect() *sql.DB {
 	config.User = os.Getenv("DB_USER")
 	config.Passwd = os.Getenv("DB_PASSWORD")
 
-	database, err := sql.Open("mysql", config.FormatDSN())
+	db, err := sql.Open("mysql", config.FormatDSN())
 
 	if (err != nil) {
 		log.Fatal("Error when trying to connect to database", err)
 	}
 
-	return database
+	db.SetMaxIdleConns(64)
+	db.SetMaxOpenConns(64)
+	db.SetConnMaxLifetime(-1)
+
+	return db
 }
 
 func SetDefaultDBConnection(db *sql.DB) *sql.DB {
