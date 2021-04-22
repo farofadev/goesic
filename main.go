@@ -15,25 +15,12 @@ func Index(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
     fmt.Fprint(res, "Welcome!\n")
 }
 
-func tryDBConnect() {
-	log.Println("Testando Conexão com o Banco de Dados...")
-
-	database := lib.DBConnect()
-	err := database.Close()
-
-	if err != nil {
-		log.Fatalln("Erro ao conectar com o Banco de Dados",err)
-	}
-
-	log.Println("Banco de Dados: OK")
-}
-
 func main() {
 	godotenv.Load()
 
 	log.Println("Iniciando...")
 
-	tryDBConnect()
+	lib.DBConnectAndSetDefault();
 
     router := httprouter.New()
 
@@ -44,6 +31,7 @@ func main() {
 	router.POST("/pedidos", pedidosController.Store)
 	router.GET("/pedidos/:id", pedidosController.Show)
 
+	defer lib.GetDefaultDBConnection().Close()
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 

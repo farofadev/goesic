@@ -58,7 +58,7 @@ func (*PedidosController) Store(res http.ResponseWriter, req *http.Request, _ ht
     re, _ := json.Marshal(payload)
 
     res.Header().Set("Content-Type", "application/json")
-	res.WriteHeader(http.StatusOK)
+	res.WriteHeader(http.StatusCreated)
     res.Write(re)
 }
 
@@ -68,6 +68,14 @@ func  (*PedidosController) Show(res http.ResponseWriter, _ *http.Request, params
     repository := &repositories.PedidoRepository{}
 
     pedido := repository.FindById(id)
+
+    if pedido.Id == "" {
+        res.Header().Set("Content-Type", "application/json")
+        res.WriteHeader(http.StatusNotFound)
+        res.Write([]byte(`{"message": "Pedido não encontrado", "error": true}`))
+
+        return
+    }
 
     var payload struct {
         Data *models.Pedido `json:"data"`
