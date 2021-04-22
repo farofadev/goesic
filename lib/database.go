@@ -55,7 +55,8 @@ func LoopVerifyDefaultDBConnection() {
 		_, err := db.Query("SHOW TABLES;")
 
 		if err != nil {
-			log.Println("Conexão falhou, tentando reconectar...")
+			log.Println("A conexão falhou: ", err)
+			log.Println("Tentando reconectar...")
 
 			DBConnectAndSetDefault();
 		}
