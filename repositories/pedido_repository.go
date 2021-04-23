@@ -3,25 +3,32 @@ package repositories
 import (
 	"fmt"
 
-	"github.com/farofadev/goesic/lib"
+	"github.com/farofadev/goesic/database"
 	"github.com/farofadev/goesic/models"
+	"github.com/farofadev/goesic/utils"
 )
 
 type PedidoRepository struct {}
 
-func (*PedidoRepository) FetchAll() (*[]models.Pedido, error) {
+func (*PedidoRepository) FetchAll(a ...interface{}) (*[]models.Pedido, error) {
 	pedidos := []models.Pedido{}
 
-	database, e1 := lib.DBConnectDefault()
+	paginatorParams, perr1 := utils.GetPaginatorParams(1, 25, a)
+
+	if perr1 != nil {
+		return &pedidos, perr1
+	}
+
+	db, e1 := database.DBConnectDefault()
 
 	if e1 != nil {
 		return &pedidos, e1
 	}
 
-	defer database.Close()
+	defer db.Close()
 
-	rawSql := fmt.Sprintf("SELECT %s FROM pedidos;", (&models.Pedido{}).SqlColumnsString())
-	rows, err := database.Query(rawSql)
+	rawSql := fmt.Sprintf("SELECT %s FROM pedidos LIMIT ? OFFSET ?;", (&models.Pedido{}).SqlColumnsString())
+	rows, err := db.Query(rawSql, paginatorParams.PageSize, paginatorParams.GetOffset())
 
 	if err != nil  {
 		return &pedidos,err
@@ -51,16 +58,16 @@ func (repository *PedidoRepository) FindById(id string) (*models.Pedido, error) 
 func (*PedidoRepository) FindBy(field string, value interface{}) (*models.Pedido, error) {
 	pedido := models.Pedido{}
 
-	database, e1 := lib.DBConnectDefault()
+	db, e1 := database.DBConnectDefault()
 
 	if e1 != nil {
 		return &pedido, e1
 	}
 
-	defer database.Close()
+	defer db.Close()
 
 	rawSql := fmt.Sprintf("SELECT %s FROM pedidos where %s = ? LIMIT 1;", pedido.SqlColumnsString(), field)
-	rows, err := database.Query(rawSql, value)
+	rows, err := db.Query(rawSql, value)
 
 	if err != nil  {
 		return &pedido, err
@@ -80,13 +87,13 @@ func (*PedidoRepository) FindBy(field string, value interface{}) (*models.Pedido
 }
 
 func (*PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {
-	database, e1 := lib.DBConnectDefault()
+	db, e1 := database.DBConnectDefault()
 
 	if e1 != nil {
 		return pedido, e1
 	}
 
-	defer database.Close()
+	defer db.Close()
 
 	if pedido.Id == "" {
 		pedido.MakeId()
@@ -98,11 +105,7 @@ func (*PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {
 	}
 
 	rawSql := fmt.Sprintf("INSERT INTO pedidos (%s) VALUES (%s);", pedido.SqlColumnsString(), pedido.SqlReplacementsString())
-	_, err := database.Exec(rawSql, pedido.RowValues()...)
+	_, err := db.Exec(rawSql, pedido.RowValues()...)
 
-	if err != nil {
-		return pedido, err
-	}
-
-	return pedido, nil
+	return pedido, err
 }

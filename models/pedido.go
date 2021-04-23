@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 )
+
 type Pedido struct {
 	Id string `json:"id"`
 	Protocolo string `json:"protocolo"`
@@ -23,15 +24,11 @@ func (pedido *Pedido) SqlColumns() []string {
 }
 
 func (pedido *Pedido) RowValues() []interface{}{
-	row := []interface{}{pedido.Id, pedido.Protocolo, pedido.PessoaId, pedido.Situacao, pedido.CriadoEm, pedido.DataPrazo}
-	
-	return row
+	return []interface{}{pedido.Id, pedido.Protocolo, pedido.PessoaId, pedido.Situacao, pedido.CriadoEm, pedido.DataPrazo}
 }
 
 func (pedido *Pedido) ScanFromSqlRows(rows *sql.Rows) error {
-	err := rows.Scan(&pedido.Id, &pedido.Protocolo, &pedido.PessoaId, &pedido.Situacao, &pedido.CriadoEm, &pedido.DataPrazo)
-
-	return err
+	return rows.Scan(&pedido.Id, &pedido.Protocolo, &pedido.PessoaId, &pedido.Situacao, &pedido.CriadoEm, &pedido.DataPrazo)
 }
 
 func (pedido *Pedido) SqlReplacementsString() string {

@@ -12,10 +12,10 @@ import (
 
 type PedidosController struct {}
 
-func (*PedidosController) Index(res http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
+func (*PedidosController) Index(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
     repository := &repositories.PedidoRepository{}
-   
-    pedidos, err := repository.FetchAll()
+    
+    pedidos, err := repository.FetchAll(req.URL.Query().Get("page"))
 
     if err != nil {
         log.Println(err)
