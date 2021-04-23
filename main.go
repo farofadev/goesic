@@ -24,7 +24,7 @@ func main() {
 	log.Println("Iniciando...")
 
     router := httprouter.New()
-
+	
 	pedidosController := &controllers.PedidosController{}
 
     router.GET("/", Index)
@@ -34,6 +34,13 @@ func main() {
 
 	go log.Println("Aplicação iniciada.")
 	
-	log.Fatal(http.ListenAndServe(":8080", router))
+	server := &http.Server{
+		Addr: ":8080",
+		Handler: router,
+		ReadTimeout: 30*time.Second,
+		WriteTimeout: 30*time.Second,
+	}
+
+	log.Fatal(server.ListenAndServe())
 }
 
