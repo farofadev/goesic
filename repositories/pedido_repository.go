@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"fmt"
+
 	"github.com/farofadev/goesic/lib"
 	"github.com/farofadev/goesic/models"
 )
@@ -12,7 +14,8 @@ func (*PedidoRepository) FetchAll() (*[]models.Pedido, error) {
 
 	database := lib.GetDefaultDBConnection()
 
-	rows, err := database.Query("SELECT id, protocolo, pessoa_id, situacao, criado_em, data_prazo FROM pedidos;")
+	rawSql := fmt.Sprintf("SELECT %s FROM pedidos;", (&models.Pedido{}).SqlColumnsString())
+	rows, err := database.Query(rawSql)
 
 	if err != nil  {
 		return &pedidos,err
@@ -23,7 +26,7 @@ func (*PedidoRepository) FetchAll() (*[]models.Pedido, error) {
 	for rows.Next() {
 		// Scan one customer record
 		pedido := models.Pedido{}
-		err := rows.Scan(&pedido.Id, &pedido.PessoaId, &pedido.Situacao, &pedido.CriadoEm, &pedido.DataPrazo)
+		err := pedido.ScanFromSqlRows(rows)
 
 		if err != nil {
 			return &pedidos, err
@@ -35,12 +38,17 @@ func (*PedidoRepository) FetchAll() (*[]models.Pedido, error) {
 	return &pedidos, nil
 }
 
-func (*PedidoRepository) FindById(id string) (*models.Pedido, error) {
+func (repository *PedidoRepository) FindById(id string) (*models.Pedido, error) {
+	return repository.FindBy("id", id)
+}
+
+func (*PedidoRepository) FindBy(field string, value interface{}) (*models.Pedido, error) {
 	pedido := models.Pedido{}
 
 	database := lib.GetDefaultDBConnection()
 
-	rows, err := database.Query("SELECT id, protocolo, pessoa_id, situacao, criado_em, data_prazo FROM pedidos where id = ? LIMIT 1;", id)
+	rawSql := fmt.Sprintf("SELECT %s FROM pedidos where %s = ? LIMIT 1;", pedido.SqlColumnsString(), field)
+	rows, err := database.Query(rawSql, value)
 
 	if err != nil  {
 		return &pedido, err
@@ -49,7 +57,8 @@ func (*PedidoRepository) FindById(id string) (*models.Pedido, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		err := rows.Scan(&pedido.Id, &pedido.PessoaId, &pedido.Situacao, &pedido.CriadoEm, &pedido.DataPrazo)
+		// Scan one customer record
+		err := pedido.ScanFromSqlRows(rows)
 
 		if err != nil {
 			return &pedido, err
@@ -60,7 +69,6 @@ func (*PedidoRepository) FindById(id string) (*models.Pedido, error) {
 }
 
 func (*PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {
-	
 	database := lib.GetDefaultDBConnection()
 
 	if pedido.Id == "" {
@@ -72,7 +80,8 @@ func (*PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {
 		pedido.Situacao = "aberto"
 	}
 
-	rows, err := database.Query("INSERT INTO pedidos (id, protocolo, pessoa_id, situacao, criado_em, data_prazo) VALUES (?,?,?,?,?,?);", pedido.Id, pedido.Protocolo, pedido.PessoaId, pedido.Situacao, pedido.CriadoEm, pedido.DataPrazo)
+	rawSql := fmt.Sprintf("INSERT INTO pedidos (%s) VALUES (%s);", pedido.SqlColumnsString(), pedido.SqlReplacementsString())
+	rows, err := database.Query(rawSql, pedido.RowValues()...)
 
 	if err != nil {
 		return pedido, err
