@@ -3,7 +3,6 @@ package repositories
 import (
 	"github.com/farofadev/goesic/lib"
 	"github.com/farofadev/goesic/models"
-	"github.com/google/uuid"
 )
 
 type PedidoRepository struct {}
@@ -13,7 +12,7 @@ func (*PedidoRepository) FetchAll() (*[]models.Pedido, error) {
 
 	database := lib.GetDefaultDBConnection()
 
-	rows, err := database.Query("SELECT id, pessoa_id, situacao, criado_em, data_prazo FROM pedidos;")
+	rows, err := database.Query("SELECT id, protocolo, pessoa_id, situacao, criado_em, data_prazo FROM pedidos;")
 
 	if err != nil  {
 		return &pedidos,err
@@ -41,7 +40,7 @@ func (*PedidoRepository) FindById(id string) (*models.Pedido, error) {
 
 	database := lib.GetDefaultDBConnection()
 
-	rows, err := database.Query("SELECT id, pessoa_id, situacao, criado_em, data_prazo FROM pedidos where id = ? LIMIT 1;", id)
+	rows, err := database.Query("SELECT id, protocolo, pessoa_id, situacao, criado_em, data_prazo FROM pedidos where id = ? LIMIT 1;", id)
 
 	if err != nil  {
 		return &pedido, err
@@ -65,14 +64,15 @@ func (*PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {
 	database := lib.GetDefaultDBConnection()
 
 	if pedido.Id == "" {
-		pedido.Id = uuid.NewString()
+		pedido.MakeId()
+		pedido.MakeProtocol()
 	}
 
 	if pedido.Situacao == "" {
 		pedido.Situacao = "aberto"
 	}
 
-	rows, err := database.Query("INSERT INTO pedidos (id, pessoa_id, situacao, criado_em, data_prazo) VALUES (?,?,?,?,?);", pedido.Id, pedido.PessoaId, pedido.Situacao, pedido.CriadoEm, pedido.DataPrazo)
+	rows, err := database.Query("INSERT INTO pedidos (id, protocolo, pessoa_id, situacao, criado_em, data_prazo) VALUES (?,?,?,?,?,?);", pedido.Id, pedido.Protocolo, pedido.PessoaId, pedido.Situacao, pedido.CriadoEm, pedido.DataPrazo)
 
 	if err != nil {
 		return pedido, err

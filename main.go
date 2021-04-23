@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/farofadev/goesic/controllers"
 	"github.com/farofadev/goesic/lib"
@@ -17,6 +19,8 @@ func Index(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 
 func main() {
 	godotenv.Load()
+
+	rand.Seed(time.Now().UnixNano())
 
 	log.Println("Iniciando...")
 

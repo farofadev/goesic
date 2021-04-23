@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/farofadev/goesic/models"
@@ -9,9 +10,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-type PedidosController struct {
-    
-}
+type PedidosController struct {}
 
 func (*PedidosController) Index(res http.ResponseWriter, _ *http.Request, _ httprouter.Params) {
     repository := &repositories.PedidoRepository{}
@@ -19,6 +18,7 @@ func (*PedidosController) Index(res http.ResponseWriter, _ *http.Request, _ http
     pedidos, err := repository.FetchAll()
 
     if err != nil {
+        log.Println(err)
         res.Header().Set("Content-Type", "application/json")
         res.WriteHeader(http.StatusInternalServerError)
         res.Write([]byte(`{"message": "Erro não esperado.", "error": true}`))
@@ -52,6 +52,7 @@ func (*PedidosController) Store(res http.ResponseWriter, req *http.Request, _ ht
     _, err := repository.Store(&pedido)
     
     if err != nil {
+        log.Println(err)
         res.Header().Set("Content-Type", "application/json")
         res.WriteHeader(http.StatusInternalServerError)
         res.Write([]byte(`{"message": "Erro não esperado.", "error": true}`))
@@ -72,7 +73,7 @@ func (*PedidosController) Store(res http.ResponseWriter, req *http.Request, _ ht
     res.Write(re)
 }
 
-func  (*PedidosController) Show(res http.ResponseWriter, _ *http.Request, params httprouter.Params) {
+func (*PedidosController) Show(res http.ResponseWriter, _ *http.Request, params httprouter.Params) {
     id := params.ByName("id")
 
     repository := &repositories.PedidoRepository{}
@@ -80,6 +81,7 @@ func  (*PedidosController) Show(res http.ResponseWriter, _ *http.Request, params
     pedido, err := repository.FindById(id)
 
     if err != nil {
+        log.Println(err)
         res.Header().Set("Content-Type", "application/json")
         res.WriteHeader(http.StatusInternalServerError)
         res.Write([]byte(`{"message": "Erro não esperado.", "error": true}`))

@@ -64,6 +64,8 @@ func LoopVerifyDefaultDBConnection() error {
 			if cerr != nil|| connection == nil {
 				previous = true
 				log.Println("Falhou ao reconectar...", cerr)
+			} else {
+				previous = false
 			}
 		} 
 
@@ -72,7 +74,5 @@ func LoopVerifyDefaultDBConnection() error {
 		} else {
 			time.Sleep(30 * time.Second)
 		}
-
-		
 	}
 }

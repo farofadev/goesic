@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS `mensagens` (
 -- Copiando estrutura para tabela goesic.pedidos
 CREATE TABLE IF NOT EXISTS `pedidos` (
   `id` char(36) NOT NULL,
+  `protocolo` varchar(24) NOT NULL, 
   `pessoa_id` char(36) NOT NULL,
   `situacao` varchar(36) DEFAULT NULL,
   `criado_em` datetime DEFAULT NULL,
