@@ -12,7 +12,13 @@ type PedidoRepository struct {}
 func (*PedidoRepository) FetchAll() (*[]models.Pedido, error) {
 	pedidos := []models.Pedido{}
 
-	database := lib.GetDefaultDBConnection()
+	database, e1 := lib.DBConnectDefault()
+
+	if e1 != nil {
+		return &pedidos, e1
+	}
+
+	defer database.Close()
 
 	rawSql := fmt.Sprintf("SELECT %s FROM pedidos;", (&models.Pedido{}).SqlColumnsString())
 	rows, err := database.Query(rawSql)
@@ -45,7 +51,13 @@ func (repository *PedidoRepository) FindById(id string) (*models.Pedido, error) 
 func (*PedidoRepository) FindBy(field string, value interface{}) (*models.Pedido, error) {
 	pedido := models.Pedido{}
 
-	database := lib.GetDefaultDBConnection()
+	database, e1 := lib.DBConnectDefault()
+
+	if e1 != nil {
+		return &pedido, e1
+	}
+
+	defer database.Close()
 
 	rawSql := fmt.Sprintf("SELECT %s FROM pedidos where %s = ? LIMIT 1;", pedido.SqlColumnsString(), field)
 	rows, err := database.Query(rawSql, value)
@@ -57,7 +69,6 @@ func (*PedidoRepository) FindBy(field string, value interface{}) (*models.Pedido
 	defer rows.Close()
 
 	for rows.Next() {
-		// Scan one customer record
 		err := pedido.ScanFromSqlRows(rows)
 
 		if err != nil {
@@ -69,7 +80,13 @@ func (*PedidoRepository) FindBy(field string, value interface{}) (*models.Pedido
 }
 
 func (*PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {
-	database := lib.GetDefaultDBConnection()
+	database, e1 := lib.DBConnectDefault()
+
+	if e1 != nil {
+		return pedido, e1
+	}
+
+	defer database.Close()
 
 	if pedido.Id == "" {
 		pedido.MakeId()
@@ -81,13 +98,11 @@ func (*PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {
 	}
 
 	rawSql := fmt.Sprintf("INSERT INTO pedidos (%s) VALUES (%s);", pedido.SqlColumnsString(), pedido.SqlReplacementsString())
-	rows, err := database.Query(rawSql, pedido.RowValues()...)
+	_, err := database.Exec(rawSql, pedido.RowValues()...)
 
 	if err != nil {
 		return pedido, err
 	}
-
-	defer rows.Close()
 
 	return pedido, nil
 }

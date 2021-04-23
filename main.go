@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/farofadev/goesic/controllers"
-	"github.com/farofadev/goesic/lib"
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 )
@@ -24,14 +23,6 @@ func main() {
 
 	log.Println("Iniciando...")
 
-	lib.DBConnectAndSetDefault();
-	
-	// Fecha conexão com o baco de dados após a execução/falha da função main()
-	defer lib.GetDefaultDBConnection().Close()
-	
-	// Execução assíncrona do loop de verificação da conexão com banco de dados
-	go lib.LoopVerifyDefaultDBConnection()
-
     router := httprouter.New()
 
 	pedidosController := &controllers.PedidosController{}
@@ -41,6 +32,8 @@ func main() {
 	router.POST("/pedidos", pedidosController.Store)
 	router.GET("/pedidos/:id", pedidosController.Show)
 
+	go log.Println("Aplicação iniciada.")
+	
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
