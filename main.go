@@ -32,7 +32,7 @@ func main() {
 	router.POST("/pedidos", pedidosController.Store)
 	router.GET("/pedidos/:id", pedidosController.Show)
 
-	go log.Println("Aplicação iniciada.")
+	defer log.Println("Finalizada.")
 	
 	server := &http.Server{
 		Addr: ":8080",
