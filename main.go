@@ -34,12 +34,12 @@ func generatePedido() {
 }
 
 func generatePedidoLoop() {
-
 	count := 100
 
 	for i := 0; i < count; i++ {
+		time.Sleep(5 * time.Minute)
+
 		generatePedido()
-		time.Sleep(time.Second)
 	}
 	
 }
@@ -49,7 +49,7 @@ func main() {
 	
 	godotenv.Load()
 
-	//go generatePedidoLoop()
+	go generatePedidoLoop()
 
 	rand.Seed(time.Now().UnixNano())
 
