@@ -43,6 +43,8 @@ func generatePedidoLoop() {
 
 		generatePedido()
 	}
+
+	log.Println("Pedidos gerados com sucesso.")
 }
 
 func main() {
@@ -53,17 +55,14 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	log.Println("Iniciando...")
-
 	router := httprouter.New()
 
-	pedidosController := &controllers.PedidosController{}
-
 	router.GET("/", Index)
-	router.GET("/pedidos", pedidosController.Index)
-	router.POST("/pedidos", pedidosController.Store)
-	router.GET("/pedidos/:id", pedidosController.Show)
+	router.GET("/pedidos", controllers.PedidosIndex)
+	router.POST("/pedidos", controllers.PedidosStore)
+	router.GET("/pedidos/:id", controllers.PedidosShow)
 
+	go log.Println("Aplicação iniciada.")
 	defer log.Println("Finalizada.")
 
 	server := &http.Server{

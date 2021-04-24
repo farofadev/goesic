@@ -7,10 +7,15 @@ services:
   app:
     build:
       context: .
+    restart: unless-stopped
     command: 
       - bash
       - -c
       - "go get && gow -e=go,env,html run main.go"
+    logging:
+      options:  
+        max-size: "500k"
+        max-file: "2"
     volumes:
       - ./:/go/src/app
     ports:
@@ -23,6 +28,10 @@ services:
       MYSQL_USER: ${DB_USER:-goesic}
       MYSQL_PASSWORD: ${DB_PASSWORD:-goesic}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-goesic}
+    logging:
+      options:  
+        max-size: "500k"
+        max-file: "2"
     volumes:
       - mysql-data:/var/lib/mysql
       - ./goesic.sql:/docker-entrypoint-initdb.d/goesic.sql

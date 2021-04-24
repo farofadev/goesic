@@ -7,12 +7,11 @@ import (
 	"github.com/farofadev/goesic/form_requests"
 	"github.com/farofadev/goesic/models"
 	"github.com/farofadev/goesic/repositories"
+	"github.com/farofadev/goesic/responses"
 	"github.com/julienschmidt/httprouter"
 )
 
-type PedidosController struct{}
-
-func (*PedidosController) Index(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func PedidosIndex(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	repository := &repositories.PedidoRepository{}
 
 	pedidos, err := repository.FetchAll(req.URL.Query().Get("page"))
@@ -20,22 +19,20 @@ func (*PedidosController) Index(res http.ResponseWriter, req *http.Request, _ ht
 	if err != nil {
 		log.Println(err)
 
-		payload := &ResponseDataPayload{}
+		payload := responses.NewResponseDataPayload()
 		payload.StatusCode = http.StatusInternalServerError
-
 		payload.Send(res)
 
 		return
 	}
 
-	payload := &ResponseDataPayload{}
+	payload := responses.NewResponseDataPayload()
 	payload.Data = pedidos
 
 	payload.Send(res)
-
 }
 
-func (*PedidosController) Store(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func PedidosStore(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	repository := &repositories.PedidoRepository{}
 
 	pedido := models.Pedido{}
@@ -43,7 +40,7 @@ func (*PedidosController) Store(res http.ResponseWriter, req *http.Request, _ ht
 
 	if _, err := form_requests.DecodeRequestBody(&formRequest, req); err != nil {
 		log.Println(err)
-		SendResponseInternalServerError(res)
+		responses.SendResponseInternalServerError(res)
 		return
 	}
 
@@ -51,19 +48,18 @@ func (*PedidosController) Store(res http.ResponseWriter, req *http.Request, _ ht
 
 	if _, err := repository.Store(&pedido); err != nil {
 		log.Println(err)
-		SendResponseInternalServerError(res)
+		responses.SendResponseInternalServerError(res)
 		return
 	}
 
-	payload := &ResponseDataPayload{
-		Data:       pedido,
-		StatusCode: http.StatusCreated,
-	}
+	payload := responses.NewResponseDataPayload()
+	payload.Data = pedido
+	payload.StatusCode = http.StatusCreated
 
 	payload.Send(res)
 }
 
-func (*PedidosController) Show(res http.ResponseWriter, _ *http.Request, params httprouter.Params) {
+func PedidosShow(res http.ResponseWriter, _ *http.Request, params httprouter.Params) {
 	id := params.ByName("id")
 
 	repository := &repositories.PedidoRepository{}
@@ -72,18 +68,16 @@ func (*PedidosController) Show(res http.ResponseWriter, _ *http.Request, params 
 
 	if err != nil {
 		log.Println(err)
-		SendResponseInternalServerError(res)
+		responses.SendResponseInternalServerError(res)
 		return
 	}
 
 	if pedido.Id == "" {
-		SendResponseNotFound(res)
+		responses.SendResponseNotFound(res)
 		return
 	}
 
-	payload := &ResponseDataPayload{
-		Data: pedido,
-	}
-
+	payload := responses.NewResponseDataPayload()
+	payload.Data = pedido
 	payload.Send(res)
 }
