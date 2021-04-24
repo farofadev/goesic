@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
+	"github.com/farofadev/goesic/form_requests"
 	"github.com/farofadev/goesic/models"
 	"github.com/farofadev/goesic/repositories"
 	"github.com/julienschmidt/httprouter"
@@ -19,58 +19,48 @@ func (*PedidosController) Index(res http.ResponseWriter, req *http.Request, _ ht
 
 	if err != nil {
 		log.Println(err)
-		res.Header().Set("Content-Type", "application/json")
-		res.WriteHeader(http.StatusInternalServerError)
-		res.Write([]byte(`{"message": "Erro não esperado.", "error": true}`))
+
+		payload := &ResponseDataPayload{}
+		payload.StatusCode = http.StatusInternalServerError
+
+		payload.Send(res)
+
 		return
 	}
 
-	var payload struct {
-		Data  *[]models.Pedido `json:"data"`
-		Error bool             `json:"error"`
-	}
-
+	payload := &ResponseDataPayload{}
 	payload.Data = pedidos
-	payload.Error = false
 
-	re, _ := json.Marshal(payload)
+	payload.Send(res)
 
-	res.Header().Set("Content-Type", "application/json")
-	res.WriteHeader(http.StatusOK)
-	res.Write(re)
 }
 
 func (*PedidosController) Store(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	repository := &repositories.PedidoRepository{}
 
-	decoder := json.NewDecoder(req.Body)
+	pedido := models.Pedido{}
+	formRequest := form_requests.PedidoFormRequest{}
 
-	var pedido models.Pedido
-
-	decoder.Decode(&pedido)
-
-	_, err := repository.Store(&pedido)
-
-	if err != nil {
+	if _, err := form_requests.DecodeRequestBody(&formRequest, req); err != nil {
 		log.Println(err)
-		res.Header().Set("Content-Type", "application/json")
-		res.WriteHeader(http.StatusInternalServerError)
-		res.Write([]byte(`{"message": "Erro não esperado.", "error": true}`))
+		SendResponseInternalServerError(res)
 		return
 	}
 
-	var payload struct {
-		Data  *models.Pedido `json:"data"`
-		Error bool           `json:"error"`
+	pedido.PessoaId = formRequest.PessoaId
+
+	if _, err := repository.Store(&pedido); err != nil {
+		log.Println(err)
+		SendResponseInternalServerError(res)
+		return
 	}
 
-	payload.Data = &pedido
+	payload := &ResponseDataPayload{
+		Data:       pedido,
+		StatusCode: http.StatusCreated,
+	}
 
-	re, _ := json.Marshal(payload)
-
-	res.Header().Set("Content-Type", "application/json")
-	res.WriteHeader(http.StatusCreated)
-	res.Write(re)
+	payload.Send(res)
 }
 
 func (*PedidosController) Show(res http.ResponseWriter, _ *http.Request, params httprouter.Params) {
@@ -82,31 +72,18 @@ func (*PedidosController) Show(res http.ResponseWriter, _ *http.Request, params 
 
 	if err != nil {
 		log.Println(err)
-		res.Header().Set("Content-Type", "application/json")
-		res.WriteHeader(http.StatusInternalServerError)
-		res.Write([]byte(`{"message": "Erro não esperado.", "error": true}`))
+		SendResponseInternalServerError(res)
 		return
 	}
 
 	if pedido.Id == "" {
-		res.Header().Set("Content-Type", "application/json")
-		res.WriteHeader(http.StatusNotFound)
-		res.Write([]byte(`{"message": "Pedido não encontrado", "error": true}`))
-
+		SendResponseNotFound(res)
 		return
 	}
 
-	var payload struct {
-		Data  *models.Pedido `json:"data"`
-		Error bool           `json:"error"`
+	payload := &ResponseDataPayload{
+		Data: pedido,
 	}
 
-	payload.Data = pedido
-	payload.Error = false
-
-	re, _ := json.Marshal(payload)
-
-	res.Header().Set("Content-Type", "application/json")
-	res.WriteHeader(http.StatusOK)
-	res.Write(re)
+	payload.Send(res)
 }
