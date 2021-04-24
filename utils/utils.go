@@ -26,6 +26,6 @@ func FormatDateTimeString(t time.Time) string {
 
 func ParseDateTimeStringToTime(value string) time.Time {
 	datetime, _ := time.Parse(DateTimeFormat, value)
-	
+
 	return datetime
 }

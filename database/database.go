@@ -19,14 +19,14 @@ func GetDefaultDBConfig() *mysql.Config {
 	return config
 }
 
-func DBConnectDefault() (*sql.DB, error){
+func DBConnectDefault() (*sql.DB, error) {
 	return DBConnect(GetDefaultDBConfig())
 }
 
 func DBConnect(config *mysql.Config) (*sql.DB, error) {
 	db, err := sql.Open("mysql", config.FormatDSN())
 
-	if (err != nil) {
+	if err != nil {
 		log.Println("Error when trying to connect to database", err)
 		return db, err
 	}
