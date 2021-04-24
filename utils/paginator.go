@@ -1,7 +1,5 @@
 package utils
 
-import "errors"
-
 type PaginatorParams struct{
 	Page int
 	PageSize int
@@ -10,7 +8,6 @@ type PaginatorParams struct{
 func GetPaginatorParams(defaultPage int, defaultPageSize int, a []interface{}) (*PaginatorParams, error){
 	page := defaultPage
 	pageSize := defaultPageSize
-	var err error
 
 	if len(a) > 0 {
 		page = GetAtoi(a[0])
@@ -21,16 +18,14 @@ func GetPaginatorParams(defaultPage int, defaultPageSize int, a []interface{}) (
 	}
 
 	if page < 1 {
-		err = errors.New("invalid page number, minimum value is 1")
 		page = defaultPage	
 	}
 
 	if pageSize < 1 {
-		err = errors.New("invalid page size number, minimum value is 1")
 		pageSize = defaultPageSize
 	}
 
-	return &PaginatorParams{Page:page,PageSize: pageSize}, err
+	return &PaginatorParams{Page:page,PageSize: pageSize}, nil
 }
 
 func (params *PaginatorParams) GetOffset() (int) {

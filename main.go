@@ -8,6 +8,10 @@ import (
 	"time"
 
 	"github.com/farofadev/goesic/controllers"
+	"github.com/farofadev/goesic/models"
+	"github.com/farofadev/goesic/repositories"
+	"github.com/farofadev/goesic/utils"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 )
@@ -16,8 +20,36 @@ func Index(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
     fmt.Fprint(res, "Welcome!\n")
 }
 
+func generatePedido() {
+
+   pedidoRepository := repositories.PedidoRepository{}
+
+   pedido := models.Pedido {
+	    PessoaId: uuid.NewString(),
+        Situacao: "aberto",
+        CriadoEm: utils.FormatDateTimeString(time.Now()),
+        DataPrazo: "2021-04-30", 
+   }
+   pedidoRepository.Store(&pedido)
+}
+
+func generatePedidoLoop() {
+
+	count := 100
+
+	for i := 0; i < count; i++ {
+		generatePedido()
+		time.Sleep(time.Second)
+	}
+	
+}
+
+
 func main() {
+	
 	godotenv.Load()
+
+	//go generatePedidoLoop()
 
 	rand.Seed(time.Now().UnixNano())
 
