@@ -18,11 +18,11 @@ var ResponseMarshalers = map[string]interface{}{
 }
 
 type ResponseDataPayload struct {
-	Data        interface{} `json:"data"`
-	Message     string      `json:"message"`
-	StatusCode  int         `json:"status_code"`
-	Error       bool        `json:"error"`
 	ContentType string      `json:"-" xml:"-"`
+	Data        interface{} `json:"data"`
+	Error       bool        `json:"error"`
+	StatusCode  int         `json:"status_code"`
+	StatusText  string      `json:"status_text"`
 }
 
 func (payload *ResponseDataPayload) Send(res http.ResponseWriter) {
@@ -30,8 +30,8 @@ func (payload *ResponseDataPayload) Send(res http.ResponseWriter) {
 		payload.StatusCode = http.StatusOK
 	}
 
-	if payload.Message == "" {
-		payload.Message = http.StatusText(payload.StatusCode)
+	if payload.StatusText == "" {
+		payload.StatusText = http.StatusText(payload.StatusCode)
 	}
 
 	if payload.ContentType == "" {

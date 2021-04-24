@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -14,10 +13,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 )
-
-func Index(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	fmt.Fprint(res, "Welcome!\n")
-}
 
 func generatePedido() {
 	pedidoRepository := repositories.PedidoRepository{}
@@ -57,7 +52,7 @@ func main() {
 
 	router := httprouter.New()
 
-	router.GET("/", Index)
+	router.GET("/", controllers.HomeIndex)
 	router.GET("/pedidos", controllers.PedidosIndex)
 	router.POST("/pedidos", controllers.PedidosStore)
 	router.GET("/pedidos/:id", controllers.PedidosShow)
