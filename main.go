@@ -26,14 +26,20 @@ func generatePedido() {
 		PessoaId: uuid.NewString(),
 	}
 
-	pedidoRepository.Store(&pedido)
+	_, err := pedidoRepository.Store(&pedido)
+
+	if err != nil {
+		log.Println("Erro ao gerar pedido", err)
+	} else {
+		log.Println("Pedido gerado:", pedido.Id)
+	}
 }
 
 func generatePedidoLoop() {
 	count := 100
 
 	for i := 0; i < count; i++ {
-		time.Sleep(5 * time.Minute)
+		time.Sleep(2 * time.Minute)
 
 		generatePedido()
 	}
