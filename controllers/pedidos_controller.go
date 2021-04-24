@@ -18,11 +18,7 @@ func PedidosIndex(res http.ResponseWriter, req *http.Request, _ httprouter.Param
 
 	if err != nil {
 		log.Println(err)
-
-		payload := responses.NewResponseDataPayload()
-		payload.StatusCode = http.StatusInternalServerError
-		payload.Send(res)
-
+		responses.SendResponseInternalServerError(res)
 		return
 	}
 
@@ -36,9 +32,9 @@ func PedidosStore(res http.ResponseWriter, req *http.Request, _ httprouter.Param
 	repository := &repositories.PedidoRepository{}
 
 	pedido := models.Pedido{}
-	formRequest := form_requests.PedidoFormRequest{}
+	formRequest := &form_requests.PedidoFormRequest{}
 
-	if _, err := form_requests.DecodeRequestBody(&formRequest, req); err != nil {
+	if _, err := form_requests.DecodeRequestBody(formRequest, req); err != nil {
 		log.Println(err)
 		responses.SendResponseInternalServerError(res)
 		return

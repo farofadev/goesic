@@ -11,10 +11,10 @@ logs:
 	docker-compose logs --tail=120 -f
 
 logs-app:
-	docker-compose logs --tail=120 --no-log-prefix -f app
+	docker-compose logs --tail=120 -f app
 
 logs-db:
-	docker-compose logs --tail=120 --no-log-prefix -f database
+	docker-compose logs --tail=120 -f database
 
 logs-database:
-	docker-compose logs --tail=120 --no-log-prefix -f database
+	docker-compose logs --tail=120 -f database
