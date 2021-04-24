@@ -8,7 +8,7 @@ import (
 	"github.com/farofadev/goesic/utils"
 )
 
-type PedidoRepository struct {}
+type PedidoRepository struct{}
 
 func (*PedidoRepository) FetchAll(a ...interface{}) (*[]models.Pedido, error) {
 	pedidos := []models.Pedido{}
@@ -30,8 +30,8 @@ func (*PedidoRepository) FetchAll(a ...interface{}) (*[]models.Pedido, error) {
 	rawSql := fmt.Sprintf("SELECT %s FROM pedidos LIMIT ? OFFSET ?;", (&models.Pedido{}).SqlColumnsString())
 	rows, err := db.Query(rawSql, paginatorParams.PageSize, paginatorParams.GetOffset())
 
-	if err != nil  {
-		return &pedidos,err
+	if err != nil {
+		return &pedidos, err
 	}
 
 	defer rows.Close()
@@ -69,7 +69,7 @@ func (*PedidoRepository) FindBy(field string, value interface{}) (*models.Pedido
 	rawSql := fmt.Sprintf("SELECT %s FROM pedidos where %s = ? LIMIT 1;", pedido.SqlColumnsString(), field)
 	rows, err := db.Query(rawSql, value)
 
-	if err != nil  {
+	if err != nil {
 		return &pedido, err
 	}
 
@@ -95,9 +95,12 @@ func (*PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {
 
 	defer db.Close()
 
-	if pedido.Id == "" {
+	if pedido.Id == "" || pedido.Protocolo == "" {
+		pedido.Situacao = models.PedidoSituacaoAberto
 		pedido.MakeId()
 		pedido.MakeProtocol()
+		pedido.MakeCriadoEm()
+		pedido.MakeDataPrazoSituacaoAberto()
 	}
 
 	if pedido.Situacao == "" {

@@ -7,23 +7,30 @@ import (
 	"strings"
 	"time"
 
+	"github.com/farofadev/goesic/utils"
 	"github.com/google/uuid"
 )
 
 type Pedido struct {
-	Id string `json:"id"`
+	Id        string `json:"id"`
 	Protocolo string `json:"protocolo"`
-	PessoaId string `json:"pessoa_id"`
-	Situacao string `json:"situacao"`
-	CriadoEm string `json:"criado_em"`
+	PessoaId  string `json:"pessoa_id"`
+	Situacao  string `json:"situacao"`
+	CriadoEm  string `json:"criado_em"`
 	DataPrazo string `json:"data_prazo"`
 }
+
+const (
+	PedidoSituacaoAberto     = "aberto"
+	PedidoSituacaoRespondido = "respondido"
+	PedidoSituacaoNegado     = "negado"
+)
 
 func (pedido *Pedido) SqlColumns() []string {
 	return []string{"id", "protocolo", "pessoa_id", "situacao", "criado_em", "data_prazo"}
 }
 
-func (pedido *Pedido) RowValues() []interface{}{
+func (pedido *Pedido) RowValues() []interface{} {
 	return []interface{}{pedido.Id, pedido.Protocolo, pedido.PessoaId, pedido.Situacao, pedido.CriadoEm, pedido.DataPrazo}
 }
 
@@ -54,4 +61,14 @@ func (pedido *Pedido) MakeId() {
 func (pedido *Pedido) MakeProtocol() {
 	superrand := rand.Int63()
 	pedido.Protocolo = time.Now().Format("060102") + fmt.Sprint(superrand)[:16]
+}
+
+func (pedido *Pedido) MakeCriadoEm() {
+	pedido.CriadoEm = utils.FormatDateTimeString(time.Now())
+}
+
+func (pedido *Pedido) MakeDataPrazoSituacaoAberto() {
+	datetime := utils.ParseDateTimeStringToTime(pedido.CriadoEm)
+
+	pedido.DataPrazo = utils.FormatDateTimeString(datetime.Add(15 * 24 * time.Hour))
 }

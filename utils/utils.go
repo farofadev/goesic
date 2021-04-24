@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+const (
+	DateTimeFormat = "06-01-02 15:04:05"
+)
+
 func GetAtoi(a interface{}) int {
 	if fmt.Sprintf("%T", a) == "string" {
 		value, _ := strconv.Atoi(a.(string))
@@ -17,8 +21,11 @@ func GetAtoi(a interface{}) int {
 }
 
 func FormatDateTimeString(t time.Time) string {
+	return t.Format(DateTimeFormat)
+}
 
-	return t.Format("06-01-02 15:04:05")
-
-
+func ParseDateTimeStringToTime(value string) time.Time {
+	datetime, _ := time.Parse(DateTimeFormat, value)
+	
+	return datetime
 }

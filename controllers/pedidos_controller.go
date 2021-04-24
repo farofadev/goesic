@@ -10,103 +10,103 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-type PedidosController struct {}
+type PedidosController struct{}
 
 func (*PedidosController) Index(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-    repository := &repositories.PedidoRepository{}
-    
-    pedidos, err := repository.FetchAll(req.URL.Query().Get("page"))
+	repository := &repositories.PedidoRepository{}
 
-    if err != nil {
-        log.Println(err)
-        res.Header().Set("Content-Type", "application/json")
-        res.WriteHeader(http.StatusInternalServerError)
-        res.Write([]byte(`{"message": "Erro não esperado.", "error": true}`))
-        return
-    }
+	pedidos, err := repository.FetchAll(req.URL.Query().Get("page"))
 
-    var payload struct {
-        Data *[]models.Pedido `json:"data"`
-        Error bool `json:"error"`
-    }
+	if err != nil {
+		log.Println(err)
+		res.Header().Set("Content-Type", "application/json")
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write([]byte(`{"message": "Erro não esperado.", "error": true}`))
+		return
+	}
 
-    payload.Data = pedidos
-    payload.Error = false
+	var payload struct {
+		Data  *[]models.Pedido `json:"data"`
+		Error bool             `json:"error"`
+	}
 
-    re, _ := json.Marshal(payload)
+	payload.Data = pedidos
+	payload.Error = false
 
-    res.Header().Set("Content-Type", "application/json")
+	re, _ := json.Marshal(payload)
+
+	res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
-    res.Write(re)
+	res.Write(re)
 }
 
 func (*PedidosController) Store(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-    repository := &repositories.PedidoRepository{}
-           
-    decoder := json.NewDecoder(req.Body)
+	repository := &repositories.PedidoRepository{}
+
+	decoder := json.NewDecoder(req.Body)
 
 	var pedido models.Pedido
 
 	decoder.Decode(&pedido)
 
-    _, err := repository.Store(&pedido)
-    
-    if err != nil {
-        log.Println(err)
-        res.Header().Set("Content-Type", "application/json")
-        res.WriteHeader(http.StatusInternalServerError)
-        res.Write([]byte(`{"message": "Erro não esperado.", "error": true}`))
-        return
-    }
+	_, err := repository.Store(&pedido)
 
-    var payload struct {
-        Data *models.Pedido `json:"data"`
-        Error bool `json:"error"`
-    }
+	if err != nil {
+		log.Println(err)
+		res.Header().Set("Content-Type", "application/json")
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write([]byte(`{"message": "Erro não esperado.", "error": true}`))
+		return
+	}
 
-    payload.Data = &pedido
+	var payload struct {
+		Data  *models.Pedido `json:"data"`
+		Error bool           `json:"error"`
+	}
 
-    re, _ := json.Marshal(payload)
+	payload.Data = &pedido
 
-    res.Header().Set("Content-Type", "application/json")
+	re, _ := json.Marshal(payload)
+
+	res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusCreated)
-    res.Write(re)
+	res.Write(re)
 }
 
 func (*PedidosController) Show(res http.ResponseWriter, _ *http.Request, params httprouter.Params) {
-    id := params.ByName("id")
+	id := params.ByName("id")
 
-    repository := &repositories.PedidoRepository{}
+	repository := &repositories.PedidoRepository{}
 
-    pedido, err := repository.FindById(id)
+	pedido, err := repository.FindById(id)
 
-    if err != nil {
-        log.Println(err)
-        res.Header().Set("Content-Type", "application/json")
-        res.WriteHeader(http.StatusInternalServerError)
-        res.Write([]byte(`{"message": "Erro não esperado.", "error": true}`))
-        return
-    }
+	if err != nil {
+		log.Println(err)
+		res.Header().Set("Content-Type", "application/json")
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write([]byte(`{"message": "Erro não esperado.", "error": true}`))
+		return
+	}
 
-    if pedido.Id == "" {
-        res.Header().Set("Content-Type", "application/json")
-        res.WriteHeader(http.StatusNotFound)
-        res.Write([]byte(`{"message": "Pedido não encontrado", "error": true}`))
+	if pedido.Id == "" {
+		res.Header().Set("Content-Type", "application/json")
+		res.WriteHeader(http.StatusNotFound)
+		res.Write([]byte(`{"message": "Pedido não encontrado", "error": true}`))
 
-        return
-    }
+		return
+	}
 
-    var payload struct {
-        Data *models.Pedido `json:"data"`
-        Error bool `json:"error"`
-    }
+	var payload struct {
+		Data  *models.Pedido `json:"data"`
+		Error bool           `json:"error"`
+	}
 
-    payload.Data = pedido
-    payload.Error = false
+	payload.Data = pedido
+	payload.Error = false
 
-    re, _ := json.Marshal(payload)
+	re, _ := json.Marshal(payload)
 
-    res.Header().Set("Content-Type", "application/json")
+	res.Header().Set("Content-Type", "application/json")
 	res.WriteHeader(http.StatusOK)
-    res.Write(re)
+	res.Write(re)
 }

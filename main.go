@@ -10,27 +10,23 @@ import (
 	"github.com/farofadev/goesic/controllers"
 	"github.com/farofadev/goesic/models"
 	"github.com/farofadev/goesic/repositories"
-	"github.com/farofadev/goesic/utils"
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 )
 
 func Index(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-    fmt.Fprint(res, "Welcome!\n")
+	fmt.Fprint(res, "Welcome!\n")
 }
 
 func generatePedido() {
+	pedidoRepository := repositories.PedidoRepository{}
 
-   pedidoRepository := repositories.PedidoRepository{}
+	pedido := models.Pedido{
+		PessoaId: uuid.NewString(),
+	}
 
-   pedido := models.Pedido {
-	    PessoaId: uuid.NewString(),
-        Situacao: "aberto",
-        CriadoEm: utils.FormatDateTimeString(time.Now()),
-        DataPrazo: "2021-04-30", 
-   }
-   pedidoRepository.Store(&pedido)
+	pedidoRepository.Store(&pedido)
 }
 
 func generatePedidoLoop() {
@@ -41,12 +37,10 @@ func generatePedidoLoop() {
 
 		generatePedido()
 	}
-	
 }
 
-
 func main() {
-	
+
 	godotenv.Load()
 
 	go generatePedidoLoop()
@@ -55,24 +49,23 @@ func main() {
 
 	log.Println("Iniciando...")
 
-    router := httprouter.New()
-	
+	router := httprouter.New()
+
 	pedidosController := &controllers.PedidosController{}
 
-    router.GET("/", Index)
-    router.GET("/pedidos", pedidosController.Index)
+	router.GET("/", Index)
+	router.GET("/pedidos", pedidosController.Index)
 	router.POST("/pedidos", pedidosController.Store)
 	router.GET("/pedidos/:id", pedidosController.Show)
 
 	defer log.Println("Finalizada.")
-	
+
 	server := &http.Server{
-		Addr: ":8080",
-		Handler: router,
-		ReadTimeout: 30*time.Second,
-		WriteTimeout: 30*time.Second,
+		Addr:         ":8080",
+		Handler:      router,
+		ReadTimeout:  30 * time.Second,
+		WriteTimeout: 30 * time.Second,
 	}
 
 	log.Fatal(server.ListenAndServe())
 }
-
