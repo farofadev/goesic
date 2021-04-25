@@ -60,12 +60,12 @@ func (repository *PedidoRepository) FindById(id string) (*models.Pedido, error) 
 }
 
 func (*PedidoRepository) FindBy(field string, value interface{}) (*models.Pedido, error) {
-	pedido := models.Pedido{}
+	pedido := models.NewPedido()
 
 	db, e1 := database.DBConnectDefault()
 
 	if e1 != nil {
-		return &pedido, e1
+		return pedido, e1
 	}
 
 	defer db.Close()
@@ -74,7 +74,7 @@ func (*PedidoRepository) FindBy(field string, value interface{}) (*models.Pedido
 	rows, err := db.Query(rawSql, value)
 
 	if err != nil {
-		return &pedido, err
+		return pedido, err
 	}
 
 	defer rows.Close()
@@ -83,11 +83,11 @@ func (*PedidoRepository) FindBy(field string, value interface{}) (*models.Pedido
 		err := pedido.ScanFromSqlRows(rows)
 
 		if err != nil {
-			return &pedido, err
+			return pedido, err
 		}
 	}
 
-	return &pedido, nil
+	return pedido, nil
 }
 
 func (*PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {

@@ -39,7 +39,7 @@ func (pedido *Pedido) RowValues() []interface{} {
 }
 
 func (pedido *Pedido) ScanFromSqlRows(rows *sql.Rows) error {
-	return rows.Scan(&pedido.Id, &pedido.Protocolo, &pedido.PessoaId, &pedido.Situacao, &pedido.CriadoEm, &pedido.DataPrazo)
+	return rows.Scan(pedido.RowValues()...)
 }
 
 func (pedido *Pedido) SqlReplacementsString() string {
