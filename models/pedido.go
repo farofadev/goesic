@@ -35,7 +35,7 @@ func (pedido *Pedido) SqlColumns() []string {
 }
 
 func (pedido *Pedido) RowValues() []interface{} {
-	return []interface{}{pedido.Id, pedido.Protocolo, pedido.PessoaId, pedido.Situacao, pedido.CriadoEm, pedido.DataPrazo}
+	return []interface{}{&pedido.Id, &pedido.Protocolo, &pedido.PessoaId, &pedido.Situacao, &pedido.CriadoEm, &pedido.DataPrazo}
 }
 
 func (pedido *Pedido) ScanFromSqlRows(rows *sql.Rows) error {
