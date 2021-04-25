@@ -26,6 +26,10 @@ const (
 	PedidoSituacaoNegado     = "negado"
 )
 
+func NewPedido() *Pedido {
+	return &Pedido{}
+}
+
 func (pedido *Pedido) SqlColumns() []string {
 	return []string{"id", "protocolo", "pessoa_id", "situacao", "criado_em", "data_prazo"}
 }
@@ -71,4 +75,12 @@ func (pedido *Pedido) MakeDataPrazoSituacaoAberto() {
 	datetime := utils.ParseDateTimeStringToTime(pedido.CriadoEm)
 
 	pedido.DataPrazo = utils.FormatDateTimeString(datetime.Add(15 * 24 * time.Hour))
+}
+
+func GetCacheKeyForPedidoId(id string) string {
+	return "pedido:" + id
+}
+
+func (pedido *Pedido) GetCacheKeyForId() string {
+	return GetCacheKeyForPedidoId(pedido.Id)
 }

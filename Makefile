@@ -4,6 +4,12 @@ up:
 down:
 	docker-compose down
 
+restart:
+	docker-compose restart
+
+restart-app:
+	docker-compose restart app
+
 prune:
 	docker-compose down -v
 

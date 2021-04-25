@@ -10,6 +10,10 @@ import (
 
 type PedidoRepository struct{}
 
+func NewPedidoRepository() *PedidoRepository {
+	return &PedidoRepository{}
+}
+
 func (*PedidoRepository) FetchAll(a ...interface{}) (*[]models.Pedido, error) {
 	pedidos := []models.Pedido{}
 

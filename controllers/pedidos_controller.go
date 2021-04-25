@@ -11,10 +11,10 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func PedidosIndex(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	repository := &repositories.PedidoRepository{}
+var pedidoRepository = repositories.NewPedidoCachedRepository()
 
-	pedidos, err := repository.FetchAll(req.URL.Query().Get("page"))
+func PedidosIndex(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+	pedidos, err := pedidoRepository.FetchAll(req.URL.Query().Get("page"))
 
 	if err != nil {
 		log.Println(err)
@@ -29,10 +29,8 @@ func PedidosIndex(res http.ResponseWriter, req *http.Request, _ httprouter.Param
 }
 
 func PedidosStore(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	repository := &repositories.PedidoRepository{}
-
-	pedido := models.Pedido{}
-	formRequest := &form_requests.PedidoFormRequest{}
+	pedido := models.NewPedido()
+	formRequest := form_requests.NewPedidoFormRequest()
 
 	if _, err := form_requests.DecodeRequestBody(formRequest, req); err != nil {
 		log.Println(err)
@@ -42,7 +40,7 @@ func PedidosStore(res http.ResponseWriter, req *http.Request, _ httprouter.Param
 
 	pedido.PessoaId = formRequest.PessoaId
 
-	if _, err := repository.Store(&pedido); err != nil {
+	if _, err := pedidoRepository.Store(pedido); err != nil {
 		log.Println(err)
 		responses.SendResponseInternalServerError(res)
 		return
@@ -58,9 +56,7 @@ func PedidosStore(res http.ResponseWriter, req *http.Request, _ httprouter.Param
 func PedidosShow(res http.ResponseWriter, _ *http.Request, params httprouter.Params) {
 	id := params.ByName("id")
 
-	repository := &repositories.PedidoRepository{}
-
-	pedido, err := repository.FindById(id)
+	pedido, err := pedidoRepository.FindById(id)
 
 	if err != nil {
 		log.Println(err)
