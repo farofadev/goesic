@@ -1,16 +1,14 @@
 package controllers
 
 import (
-	"net/http"
-
 	"github.com/farofadev/goesic/responses"
-	"github.com/julienschmidt/httprouter"
+	"github.com/gofiber/fiber/v2"
 )
 
-func HomeIndex(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func HomeIndex(ctx *fiber.Ctx) error {
 	payload := responses.NewResponseDataPayload()
 
-	payload.Data = "Bem-vindo!"
+	payload.Data = map[string]string{"message": "Bem-vindo!"}
 
-	payload.Send(res)
+	return payload.Send(ctx)
 }

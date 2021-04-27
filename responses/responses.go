@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"net/http"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 const (
@@ -25,7 +27,7 @@ type ResponseDataPayload struct {
 	StatusText  string      `json:"status_text"`
 }
 
-func (payload *ResponseDataPayload) Send(res http.ResponseWriter) {
+func (payload *ResponseDataPayload) Send(ctx *fiber.Ctx) error {
 	if payload.StatusCode == 0 {
 		payload.StatusCode = http.StatusOK
 	}
@@ -44,9 +46,9 @@ func (payload *ResponseDataPayload) Send(res http.ResponseWriter) {
 
 	bytes := payload.Marshal()
 
-	res.Header().Set("Content-Type", payload.ContentType)
-	res.WriteHeader(payload.StatusCode)
-	res.Write(bytes)
+	ctx.Set("Content-Type", payload.ContentType)
+
+	return ctx.Send(bytes)
 }
 
 func (payload *ResponseDataPayload) SetStatusCode(code int) *ResponseDataPayload {
@@ -77,18 +79,16 @@ func NewResponseDataPayload() *ResponseDataPayload {
 	return &ResponseDataPayload{}
 }
 
-func SendResponseInternalServerError(res http.ResponseWriter) {
-	payload := ResponseDataPayload{
-		StatusCode: http.StatusInternalServerError,
-	}
+func SendResponseInternalServerError(ctx *fiber.Ctx) error {
+	payload := NewResponseDataPayload()
+	payload.StatusCode = http.StatusInternalServerError
 
-	payload.Send(res)
+	return payload.Send(ctx)
 }
 
-func SendResponseNotFound(res http.ResponseWriter) {
-	payload := ResponseDataPayload{
-		StatusCode: http.StatusNotFound,
-	}
+func SendResponseNotFound(ctx *fiber.Ctx) error {
+	payload := NewResponseDataPayload()
+	payload.StatusCode = http.StatusNotFound
 
-	payload.Send(res)
+	return payload.Send(ctx)
 }

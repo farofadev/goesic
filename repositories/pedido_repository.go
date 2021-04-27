@@ -31,7 +31,7 @@ func (*PedidoRepository) FetchAll(a ...interface{}) (*[]models.Pedido, error) {
 
 	defer db.Close()
 
-	rawSql := fmt.Sprintf("SELECT %s FROM pedidos LIMIT ? OFFSET ?;", (&models.Pedido{}).SqlColumnsString())
+	rawSql := fmt.Sprintf("SELECT %s FROM pedidos ORDER BY criado_em DESC LIMIT ? OFFSET ?;", (&models.Pedido{}).SqlColumnsString())
 	rows, err := db.Query(rawSql, paginatorParams.PageSize, paginatorParams.GetOffset())
 
 	if err != nil {

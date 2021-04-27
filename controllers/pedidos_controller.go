@@ -8,68 +8,70 @@ import (
 	"github.com/farofadev/goesic/models"
 	"github.com/farofadev/goesic/repositories"
 	"github.com/farofadev/goesic/responses"
-	"github.com/julienschmidt/httprouter"
+	"github.com/gofiber/fiber/v2"
 )
 
 var pedidoRepository = repositories.NewPedidoCachedRepository()
 
-func PedidosIndex(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	pedidos, err := pedidoRepository.FetchAll(req.URL.Query().Get("page"))
+func PedidosIndex(ctx *fiber.Ctx) error {
+	page := ctx.Query("page")
+	pedidos, err := pedidoRepository.FetchAll(page)
 
 	if err != nil {
 		log.Println(err)
-		responses.SendResponseInternalServerError(res)
-		return
+		responses.SendResponseInternalServerError(ctx)
+		return err
 	}
 
 	payload := responses.NewResponseDataPayload()
 	payload.Data = pedidos
 
-	payload.Send(res)
+	return payload.Send(ctx)
 }
 
-func PedidosStore(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func PedidosStore(ctx *fiber.Ctx) error {
 	pedido := models.NewPedido()
 	formRequest := form_requests.NewPedidoFormRequest()
 
-	if _, err := form_requests.DecodeRequestBody(formRequest, req); err != nil {
+	if err := ctx.BodyParser(formRequest); err != nil {
 		log.Println(err)
-		responses.SendResponseInternalServerError(res)
-		return
+		responses.SendResponseInternalServerError(ctx)
+		return err
 	}
 
 	pedido.PessoaId = formRequest.PessoaId
 
 	if _, err := pedidoRepository.Store(pedido); err != nil {
 		log.Println(err)
-		responses.SendResponseInternalServerError(res)
-		return
+		responses.SendResponseInternalServerError(ctx)
+		return err
 	}
 
 	payload := responses.NewResponseDataPayload()
 	payload.Data = pedido
 	payload.StatusCode = http.StatusCreated
 
-	payload.Send(res)
+	return payload.Send(ctx)
 }
 
-func PedidosShow(res http.ResponseWriter, _ *http.Request, params httprouter.Params) {
-	id := params.ByName("id")
+func PedidosShow(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
 
 	pedido, err := pedidoRepository.FindById(id)
 
 	if err != nil {
 		log.Println(err)
-		responses.SendResponseInternalServerError(res)
-		return
+		responses.SendResponseInternalServerError(ctx)
+		return err
 	}
 
 	if pedido.Id == "" {
-		responses.SendResponseNotFound(res)
-		return
+		responses.SendResponseNotFound(ctx)
+		return err
 	}
 
 	payload := responses.NewResponseDataPayload()
 	payload.Data = pedido
-	payload.Send(res)
+
+	return payload.Send(ctx)
 }
