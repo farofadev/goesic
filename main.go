@@ -10,8 +10,8 @@ import (
 	"github.com/farofadev/goesic/models"
 	"github.com/farofadev/goesic/repositories"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
-	"github.com/julienschmidt/httprouter"
 )
 
 func generatePedido() {
@@ -50,19 +50,25 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 
-	router := httprouter.New()
+	// router := httprouter.New()
 
-	router.GET("/", controllers.HomeIndex)
-	router.GET("/pedidos", controllers.PedidosIndex)
-	router.POST("/pedidos", controllers.PedidosStore)
-	router.GET("/pedidos/:id", controllers.PedidosShow)
+	// router.GET("/", controllers.HomeIndex)
+	// router.GET("/pedidos", controllers.PedidosIndex)
+	// router.POST("/pedidos", controllers.PedidosStore)
+	// router.GET("/pedidos/:id", controllers.PedidosShow)
+
+	r := mux.NewRouter()
+	r.HandleFunc("/", controllers.HomeIndex).Methods("GET")
+	r.HandleFunc("/pedidos", controllers.PedidosIndex).Methods("GET")
+	r.HandleFunc("/pedidos", controllers.PedidosStore).Methods("POST")
+	r.HandleFunc("/pedidos/{id}", controllers.PedidosShow).Methods("GET")
 
 	go log.Println("Aplicação iniciada.")
 	defer log.Println("Finalizada.")
 
 	server := &http.Server{
 		Addr:         ":8080",
-		Handler:      router,
+		Handler:      r,
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}

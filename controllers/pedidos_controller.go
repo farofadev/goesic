@@ -8,12 +8,12 @@ import (
 	"github.com/farofadev/goesic/models"
 	"github.com/farofadev/goesic/repositories"
 	"github.com/farofadev/goesic/responses"
-	"github.com/julienschmidt/httprouter"
+	"github.com/gorilla/mux"
 )
 
 var pedidoRepository = repositories.NewPedidoCachedRepository()
 
-func PedidosIndex(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func PedidosIndex(res http.ResponseWriter, req *http.Request) {
 	pedidos, err := pedidoRepository.FetchAll(req.URL.Query().Get("page"))
 
 	if err != nil {
@@ -28,7 +28,7 @@ func PedidosIndex(res http.ResponseWriter, req *http.Request, _ httprouter.Param
 	payload.Send(res)
 }
 
-func PedidosStore(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func PedidosStore(res http.ResponseWriter, req *http.Request) {
 	pedido := models.NewPedido()
 	formRequest := form_requests.NewPedidoFormRequest()
 
@@ -53,10 +53,11 @@ func PedidosStore(res http.ResponseWriter, req *http.Request, _ httprouter.Param
 	payload.Send(res)
 }
 
-func PedidosShow(res http.ResponseWriter, _ *http.Request, params httprouter.Params) {
-	id := params.ByName("id")
+func PedidosShow(res http.ResponseWriter, req *http.Request) {
 
-	pedido, err := pedidoRepository.FindById(id)
+	params := mux.Vars(req)
+
+	pedido, err := pedidoRepository.FindById(params["id"])
 
 	if err != nil {
 		log.Println(err)

@@ -4,10 +4,9 @@ import (
 	"net/http"
 
 	"github.com/farofadev/goesic/responses"
-	"github.com/julienschmidt/httprouter"
 )
 
-func HomeIndex(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
+func HomeIndex(res http.ResponseWriter, req *http.Request) {
 	payload := responses.NewResponseDataPayload()
 
 	payload.Data = "Bem-vindo!"
