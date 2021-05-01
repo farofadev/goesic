@@ -17,10 +17,10 @@ func NewPedidoRepository() *PedidoRepository {
 func (*PedidoRepository) FetchAll(a ...interface{}) (*[]models.Pedido, error) {
 	pedidos := []models.Pedido{}
 
-	paginatorParams, perr1 := utils.GetPaginatorParams(1, 25, a)
+	paginatorParams, err := utils.GetPaginatorParams(1, 25, a)
 
-	if perr1 != nil {
-		return &pedidos, perr1
+	if err != nil {
+		return &pedidos, err
 	}
 
 	db, e1 := database.DBConnectDefault()
