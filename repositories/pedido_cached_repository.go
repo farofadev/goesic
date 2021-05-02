@@ -66,22 +66,19 @@ func (repo *PedidoCachedRepository) FindById(id string) (*models.Pedido, error) 
 	return pedido, err
 }
 
-func (repo *PedidoCachedRepository) FetchAll(a ...interface{}) (*[]models.Pedido, error) {
+func (repo *PedidoCachedRepository) FetchAll(page string) (*[]models.Pedido, error) {
 
-	cacheKey := "gshghsgashgashaghags"
+	cacheKey := page
 
 	cacheData := NewPedidosCacheData()
 
 	if value, found := PedidoCacheStore.Get(cacheKey); found {
+		log.Println("Cache key encontrado! " + cacheKey)
 		cacheData := value.(*PedidosCacheData)
 		return cacheData.Pedidos, *cacheData.Err
 	}
 
-	pedidos, err := repo.PedidoRepository.FetchAll(a...)
-
-	// page, error := utils.GetPaginatorParams(1, 25, []{pedidos})
-
-	log.Printf("%T", pedidos)
+	pedidos, err := repo.PedidoRepository.FetchAll(page)
 
 	cacheData.Pedidos = pedidos
 	cacheData.Err = &err
