@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"log"
 	"time"
 
 	"github.com/farofadev/goesic/models"
@@ -73,7 +72,7 @@ func (repo *PedidoCachedRepository) FetchAll(page string) (*[]models.Pedido, err
 	cacheData := NewPedidosCacheData()
 
 	if value, found := PedidoCacheStore.Get(cacheKey); found {
-		log.Println("Cache key encontrado! " + cacheKey)
+		//log.Println("Cache key encontrado! " + cacheKey)
 		cacheData := value.(*PedidosCacheData)
 		return cacheData.Pedidos, *cacheData.Err
 	}
