@@ -8,15 +8,13 @@ import (
 	"time"
 
 	"github.com/farofadev/goesic/utils"
-	"github.com/google/uuid"
 )
 
 type Pedido struct {
-	Id        string `json:"id"`
+	ModelImpl
 	Protocolo string `json:"protocolo"`
 	PessoaId  string `json:"pessoa_id"`
 	Situacao  string `json:"situacao"`
-	CriadoEm  string `json:"criado_em"`
 	DataPrazo string `json:"data_prazo"`
 }
 
@@ -58,17 +56,9 @@ func (pedido *Pedido) SqlColumnsString() string {
 	return strings.Join(pedido.SqlColumns(), ", ")
 }
 
-func (pedido *Pedido) MakeId() {
-	pedido.Id = uuid.NewString()
-}
-
 func (pedido *Pedido) MakeProtocol() {
 	superrand := rand.Int63()
 	pedido.Protocolo = time.Now().Format("060102") + fmt.Sprint(superrand)[:16]
-}
-
-func (pedido *Pedido) MakeCriadoEm() {
-	pedido.CriadoEm = utils.FormatDateTimeString(time.Now())
 }
 
 func (pedido *Pedido) MakeDataPrazoSituacaoAberto() {

@@ -101,9 +101,9 @@ func (*PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {
 
 	if pedido.Id == "" || pedido.Protocolo == "" {
 		pedido.Situacao = models.PedidoSituacaoAberto
-		pedido.MakeId()
+		pedido.SetId()
 		pedido.MakeProtocol()
-		pedido.MakeCriadoEm()
+		pedido.SetCriadoEm()
 		pedido.MakeDataPrazoSituacaoAberto()
 	}
 
