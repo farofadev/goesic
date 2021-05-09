@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/farofadev/goesic/models"
+	"github.com/farofadev/goesic/utils"
 	"github.com/patrickmn/go-cache"
 )
 
@@ -65,19 +66,20 @@ func (repo *PedidoCachedRepository) FindById(id string) (*models.Pedido, error) 
 	return pedido, err
 }
 
-func (repo *PedidoCachedRepository) FetchAll(page string) (*[]models.Pedido, error) {
+func (repo *PedidoCachedRepository) FetchAll(a ...interface{}) (*[]models.Pedido, error) {
+	paginatorParams, err := utils.GetPaginatorParams(repo.GetPaginatorConfig(), a...)
 
-	cacheKey := page
+	cacheKey := models.GetCacheKeyForPedidosPaginator(paginatorParams)
 
 	cacheData := NewPedidosCacheData()
 
 	if value, found := PedidoCacheStore.Get(cacheKey); found {
-		//log.Println("Cache key encontrado! " + cacheKey)
 		cacheData := value.(*PedidosCacheData)
+
 		return cacheData.Pedidos, *cacheData.Err
 	}
 
-	pedidos, err := repo.PedidoRepository.FetchAll(page)
+	pedidos, err := repo.PedidoRepository.FetchAll(a...)
 
 	cacheData.Pedidos = pedidos
 	cacheData.Err = &err
