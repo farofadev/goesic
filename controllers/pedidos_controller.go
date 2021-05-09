@@ -13,6 +13,7 @@ import (
 
 var pedidoRepository = repositories.NewPedidoCachedRepository()
 
+//PedidosIndex Essa função faz tal coisa...
 func PedidosIndex(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
 	pedidos, err := pedidoRepository.FetchAll(req.URL.Query().Get("page"))
 

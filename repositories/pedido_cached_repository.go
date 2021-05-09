@@ -16,6 +16,11 @@ type PedidoCacheData struct {
 	Err    *error
 }
 
+type PedidosCacheData struct {
+	Pedidos *[]models.Pedido
+	Err     *error
+}
+
 // Tempo de cache de cada chave
 var PedidoCacheDuration = 15 * time.Second
 
@@ -36,6 +41,10 @@ func NewPedidoCacheData() *PedidoCacheData {
 	return &PedidoCacheData{}
 }
 
+func NewPedidosCacheData() *PedidosCacheData {
+	return &PedidosCacheData{}
+}
+
 func (repo *PedidoCachedRepository) FindById(id string) (*models.Pedido, error) {
 	cacheKey := models.GetCacheKeyForPedidoId(id)
 
@@ -43,7 +52,6 @@ func (repo *PedidoCachedRepository) FindById(id string) (*models.Pedido, error) 
 
 	if value, found := PedidoCacheStore.Get(cacheKey); found {
 		cacheData := value.(*PedidoCacheData)
-
 		return cacheData.Pedido, *cacheData.Err
 	}
 
@@ -55,4 +63,27 @@ func (repo *PedidoCachedRepository) FindById(id string) (*models.Pedido, error) 
 	PedidoCacheStore.Add(cacheKey, cacheData, PedidoCacheDuration)
 
 	return pedido, err
+}
+
+func (repo *PedidoCachedRepository) FetchAll(page string) (*[]models.Pedido, error) {
+
+	cacheKey := page
+
+	cacheData := NewPedidosCacheData()
+
+	if value, found := PedidoCacheStore.Get(cacheKey); found {
+		//log.Println("Cache key encontrado! " + cacheKey)
+		cacheData := value.(*PedidosCacheData)
+		return cacheData.Pedidos, *cacheData.Err
+	}
+
+	pedidos, err := repo.PedidoRepository.FetchAll(page)
+
+	cacheData.Pedidos = pedidos
+	cacheData.Err = &err
+
+	PedidoCacheStore.Add(cacheKey, cacheData, 15*time.Second)
+
+	return pedidos, err
+
 }
