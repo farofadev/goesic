@@ -1,4 +1,4 @@
-FROM golang:1
+FROM golang:1.16.4-buster
 
 RUN go install github.com/mitranim/gow@latest
 

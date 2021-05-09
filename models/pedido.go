@@ -24,6 +24,8 @@ const (
 	PedidoSituacaoNegado     = "negado"
 )
 
+const PedidoPrazoInicial = 15 * 24 * time.Hour
+
 func NewPedido() *Pedido {
 	return &Pedido{}
 }
@@ -65,11 +67,15 @@ func (pedido *Pedido) MakeProtocol() {
 func (pedido *Pedido) MakeDataPrazoSituacaoAberto() {
 	datetime := utils.ParseDateTimeStringToTime(pedido.CriadoEm)
 
-	pedido.DataPrazo = utils.FormatDateTimeString(datetime.Add(15 * 24 * time.Hour))
+	pedido.DataPrazo = utils.FormatDateTimeString(datetime.Add(PedidoPrazoInicial))
 }
 
 func GetCacheKeyForPedidoId(id string) string {
 	return "pedido:" + id
+}
+
+func GetCacheKeyForPedidosPaginator(params *utils.PaginatorParams) string {
+	return fmt.Sprintf("pedidos:%s", params.GetCacheKey())
 }
 
 func (pedido *Pedido) GetCacheKeyForId() string {

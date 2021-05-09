@@ -14,10 +14,14 @@ func NewPedidoRepository() *PedidoRepository {
 	return &PedidoRepository{}
 }
 
-func (*PedidoRepository) FetchAll(a ...interface{}) (*[]models.Pedido, error) {
+func (*PedidoRepository) GetPaginatorConfig() *utils.PaginatorConfig {
+	return utils.NewPaginatorConfig()
+}
+
+func (repo *PedidoRepository) FetchAll(a ...interface{}) (*[]models.Pedido, error) {
 	pedidos := []models.Pedido{}
 
-	paginatorParams, err := utils.GetPaginatorParams(1, 25, a)
+	paginatorParams, err := utils.GetPaginatorParams(repo.GetPaginatorConfig(), a...)
 
 	if err != nil {
 		return &pedidos, err

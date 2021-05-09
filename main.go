@@ -7,46 +7,13 @@ import (
 	"time"
 
 	"github.com/farofadev/goesic/controllers"
-	"github.com/farofadev/goesic/models"
-	"github.com/farofadev/goesic/repositories"
-	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
 )
 
-func generatePedido() {
-	pedidoRepository := repositories.PedidoRepository{}
-
-	pedido := models.Pedido{
-		PessoaId: uuid.NewString(),
-	}
-
-	_, err := pedidoRepository.Store(&pedido)
-
-	if err != nil {
-		log.Println("Erro ao gerar pedido", err)
-	} else {
-		log.Println("Pedido gerado:", pedido.Id)
-	}
-}
-
-func generatePedidoLoop() {
-	count := 100
-
-	for i := 0; i < count; i++ {
-		time.Sleep(2 * time.Minute)
-
-		generatePedido()
-	}
-
-	log.Println("Pedidos gerados com sucesso.")
-}
-
 func main() {
 
 	godotenv.Load()
-
-	go generatePedidoLoop()
 
 	rand.Seed(time.Now().UnixNano())
 
