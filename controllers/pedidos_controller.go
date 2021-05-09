@@ -73,3 +73,9 @@ func PedidosShow(res http.ResponseWriter, _ *http.Request, params httprouter.Par
 	payload.Data = pedido
 	payload.Send(res)
 }
+
+func PedidosUpdate(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+
+	id := params.ByName("id")
+	log.Println(id)
+}

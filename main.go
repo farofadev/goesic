@@ -56,6 +56,7 @@ func main() {
 	router.GET("/pedidos", controllers.PedidosIndex)
 	router.POST("/pedidos", controllers.PedidosStore)
 	router.GET("/pedidos/:id", controllers.PedidosShow)
+	router.POST("/pedidos/responder/:id", controllers.PedidosUpdate)
 
 	go log.Println("Aplicação iniciada.")
 	defer log.Println("Finalizada.")
