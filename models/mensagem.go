@@ -15,6 +15,12 @@ type Mensagem struct {
 	Tipo           string `json:"tipo"`
 }
 
+const (
+	TipoPedido   = "pedido"
+	TipoResposta = "resposta"
+	TipoRecurso  = "recurso"
+)
+
 func NewMensagem() *Mensagem {
 	return &Mensagem{}
 }
@@ -26,7 +32,7 @@ func (mensagem *Mensagem) SqlColumns() []string {
 
 func (mensagem *Mensagem) RowValues() []interface{} {
 
-	return []interface{}{&mensagem.Id, &mensagem.PedidoId, &mensagem.PessoaId, &mensagem.UsuarioId, &mensagem.Mensagem, &mensagem.Tipo}
+	return []interface{}{&mensagem.Id, &mensagem.PedidoId, &mensagem.PessoaId, &mensagem.UsuarioId, &mensagem.Mensagem, &mensagem.SituacaoPedido, &mensagem.Tipo, &mensagem.CriadoEm}
 }
 
 func (mensagem *Mensagem) ScanFromSqlRows(rows *sql.Rows) error {
@@ -44,11 +50,11 @@ func (mensagem *Mensagem) SqlReplacementsString() string {
 		replacements[i] = "?"
 	}
 
-	return strings.Join(replacements, "")
+	return strings.Join(replacements, ",")
 
 }
 
 func (mensagem *Mensagem) SqlColumnsString() string {
 
-	return strings.Join(mensagem.SqlColumns(), ",")
+	return strings.Join(mensagem.SqlColumns(), ", ")
 }

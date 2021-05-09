@@ -12,6 +12,7 @@ import (
 )
 
 var pedidoRepository = repositories.NewPedidoCachedRepository()
+var mensagemRepository = repositories.NewMensagemRepository()
 
 //PedidosIndex Essa função faz tal coisa...
 func PedidosIndex(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
@@ -39,7 +40,7 @@ func PedidosStore(res http.ResponseWriter, req *http.Request, _ httprouter.Param
 		return
 	}
 
-	pedido.PessoaId = formRequest.PessoaId
+	//pedido.PessoaId = formRequest.PessoaId
 
 	if _, err := pedidoRepository.Store(pedido); err != nil {
 		log.Println(err)
@@ -75,8 +76,31 @@ func PedidosShow(res http.ResponseWriter, _ *http.Request, params httprouter.Par
 	payload.Send(res)
 }
 
-func PedidosUpdate(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
+func PedidosResponder(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 
 	id := params.ByName("id")
-	log.Println(id)
+	mensagem := models.NewMensagem()
+
+	if _, err := form_requests.DecodeRequestBody(mensagem, req); err != nil {
+		log.Println(err)
+		responses.SendResponseInternalServerError(res)
+		return
+	}
+
+	if _, err := pedidoRepository.Responder(id, mensagem.Tipo); err != nil {
+		log.Println(err)
+		responses.SendResponseInternalServerError(res)
+		return
+	}
+
+	if _, err := mensagemRepository.Store(mensagem); err != nil {
+		log.Println(err)
+		responses.SendResponseInternalServerError(res)
+		return
+	}
+
+	payload := responses.NewResponseDataPayload()
+	payload.Data = mensagem
+	payload.Send(res)
+
 }
