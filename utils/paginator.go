@@ -16,14 +16,14 @@ type PaginatorConfig struct {
 
 const (
 	DefaultPaginatorPageSize    = 25
-	DefaultPagaintorMaxPageSize = 100
+	DefaultPaginatorMaxPageSize = 100
 	DefaultPaginatorPage        = 1
 )
 
 func NewPaginatorConfig() *PaginatorConfig {
 	return &PaginatorConfig{
 		MaxPage:         -1,
-		MaxPageSize:     DefaultPagaintorMaxPageSize,
+		MaxPageSize:     DefaultPaginatorMaxPageSize,
 		DefaultPage:     DefaultPaginatorPage,
 		DefaultPageSize: DefaultPaginatorPageSize,
 	}
