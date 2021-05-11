@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/farofadev/goesic/database"
 	"github.com/farofadev/goesic/models"
@@ -122,10 +121,8 @@ func (*PedidoRepository) Store(pedido *models.Pedido) (*models.Pedido, error) {
 	return pedido, err
 }
 
-//Responder Salva a mensagem no banco de dados com seus respectivos dados e chama método que atualiza estado do pedido (aberto, respondido, negado)
-func (repository *PedidoRepository) Responder(id string, tipo string) (interface{}, error) {
-
-	log.Println("Estou no pedido repository", id)
+//Update Atualiza situacao do pedido a partir da tipo de mensagem recebida
+func (repository *PedidoRepository) Update(id string, tipo string) (interface{}, error) {
 
 	pedido, err := repository.FindById(id)
 
@@ -138,15 +135,24 @@ func (repository *PedidoRepository) Responder(id string, tipo string) (interface
 	if err != nil {
 		return db, err
 	}
+
 	defer db.Close()
 
-	updatePedido, err := db.Prepare("UPDATE pedidos SET situacao=? WHERE id=?")
+	switch tipo {
+	case "resposta":
+		pedido.Situacao = "respondido"
+	case "negado":
+		pedido.Situacao = "negado"
 
-	tx, err := db.Begin()
+	}
 
-	res, err := tx.Stmt(updatePedido).Exec("respondido", id)
+	// Modify some data in table.
+	res, err := db.Exec("UPDATE pedidos SET situacao = ? WHERE id = ?", pedido.Situacao, id)
+	//checkError(err)
 
-	log.Println("Aqui o pedido encontrado", pedido.Protocolo, err)
+	if err != nil {
+		return db, err
+	}
 
 	return res, err
 

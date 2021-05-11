@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/farofadev/goesic/database"
 	"github.com/farofadev/goesic/models"
@@ -22,23 +21,18 @@ func (*MensagemRepository) Store(mensagem *models.Mensagem) (*models.Mensagem, e
 	}
 	defer db.Close()
 
-	// 	ModelImpl
-	// 	PedidoId       string `json:"pedido_id"`
-	// 	PessoaId       string `json:"pessoa_id"`
-	// 	UsuarioId      string `json:"usuario_id"`
-	// 	Mensagem       string `json:"mensagem"`
-	// 	SituacaoPedido string `json:"situacao_pedido"`
-	// 	Tipo           string `json:"tipo"`
-	// }
-
 	mensagem.SetId()
 	mensagem.SetCriadoEm()
 
-	log.Println("collumns string: ", mensagem.SqlColumnsString())
+	switch mensagem.Tipo {
+	case "resposta_pedido":
+		mensagem.SituacaoPedido = models.PedidoSituacaoRespondido
+	case "negado_pedido":
+		mensagem.SituacaoPedido = models.PedidoSituacaoNegado
+	default:
+		mensagem.SituacaoPedido = models.PedidoSituacaoAberto
 
-	log.Println("collumns string: ", mensagem.SqlReplacementsString())
-
-	log.Println("values: ", mensagem.RowValues())
+	}
 
 	rawSql := fmt.Sprintf("INSERT INTO mensagens (%s) VALUES (%s);", mensagem.SqlColumnsString(), mensagem.SqlReplacementsString())
 	_, err = db.Exec(rawSql, mensagem.RowValues()...)

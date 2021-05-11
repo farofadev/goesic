@@ -11,12 +11,13 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-var pedidoRepository = repositories.NewPedidoCachedRepository()
+var pedidoCacheRepository = repositories.NewPedidoCachedRepository()
+var pedidoRepository = repositories.NewPedidoRepository()
 var mensagemRepository = repositories.NewMensagemRepository()
 
 //PedidosIndex Essa função faz tal coisa...
 func PedidosIndex(res http.ResponseWriter, req *http.Request, _ httprouter.Params) {
-	pedidos, err := pedidoRepository.FetchAll(req.URL.Query().Get("page"))
+	pedidos, err := pedidoCacheRepository.FetchAll(req.URL.Query().Get("page"))
 
 	if err != nil {
 		log.Println(err)
@@ -58,7 +59,7 @@ func PedidosStore(res http.ResponseWriter, req *http.Request, _ httprouter.Param
 func PedidosShow(res http.ResponseWriter, _ *http.Request, params httprouter.Params) {
 	id := params.ByName("id")
 
-	pedido, err := pedidoRepository.FindById(id)
+	pedido, err := pedidoCacheRepository.FindById(id)
 
 	if err != nil {
 		log.Println(err)
@@ -87,7 +88,7 @@ func PedidosResponder(res http.ResponseWriter, req *http.Request, params httprou
 		return
 	}
 
-	if _, err := pedidoRepository.Responder(id, mensagem.Tipo); err != nil {
+	if _, err := pedidoRepository.Update(id, mensagem.Tipo); err != nil {
 		log.Println(err)
 		responses.SendResponseInternalServerError(res)
 		return
