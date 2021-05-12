@@ -79,8 +79,12 @@ func PedidosShow(res http.ResponseWriter, _ *http.Request, params httprouter.Par
 
 func PedidosResponder(res http.ResponseWriter, req *http.Request, params httprouter.Params) {
 
-	id := params.ByName("id")
+	PedidoId := params.ByName("id")
 	mensagem := models.NewMensagem()
+
+	mensagem.PedidoId = PedidoId
+
+	log.Println("MENSAGEM COM PEDIDO ID AQUI: ", mensagem.PedidoId)
 
 	if _, err := form_requests.DecodeRequestBody(mensagem, req); err != nil {
 		log.Println(err)
@@ -88,7 +92,7 @@ func PedidosResponder(res http.ResponseWriter, req *http.Request, params httprou
 		return
 	}
 
-	if _, err := pedidoRepository.Update(id, mensagem.Tipo); err != nil {
+	if _, err := pedidoRepository.Update(PedidoId, mensagem.Tipo); err != nil {
 		log.Println(err)
 		responses.SendResponseInternalServerError(res)
 		return
